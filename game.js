@@ -1,8 +1,18 @@
 function setup() {
   createCanvas(700, 700);
+
+  for (let i = 0; i < 1000; i++) {
+    const x = Math.floor(Math.random() * width);
+    const y = Math.floor(Math.random() * height);
+    const alpha = Math.random();
+    starX.push(x);
+    starY.push(y);
+    starAlpha.push(alpha);
+  }
 }
 
-let mouseIsClicked = false;
+let buttonIsClicked = false;
+let state = "start";
 let x = 0;
 let y = 0;
 let leftRight = 0;
@@ -10,12 +20,132 @@ let maxVelocity = 0.5;
 let down = 1;
 let up = 0.3;
 let isGameActive = true;
-
 let starX = [];
 let starY = [];
 let starAlpha = [];
 
-//Rocket
+// START SCREEN
+function startScreen() {
+  background(48, 25, 52);
+  fill(255, 255, 255);
+  noStroke();
+  textSize(30);
+  textFont("Futura");
+  text("Lunar Lander", 258, 200);
+  textSize(15);
+  text(
+    "Use arrow left & right to move the rocket from side to side,",
+    155,
+    280
+  );
+  text("and the space key to control the velocity,", 209, 310);
+  text("to safely land the rocket on the moon.", 217, 340);
+
+  // Play button
+  fill(255, 255, 255);
+  noStroke();
+  rect(275, 400, 150, 50);
+  fill(0, 0, 0);
+  textSize(15);
+  text("PLAY GAME", 307, 430);
+
+  if (buttonIsClicked) {
+    gameScreen();
+    isGameActive = true;
+  }
+}
+
+function mousePressed() {
+  if (mouseX > 275 && mouseX < 275 + 150 && mouseY > 400 && mouseY < 400 + 50) {
+    state = "game";
+  }
+}
+
+// GAME OVER SCREEN
+function gameoverScreen() {
+  background(48, 25, 52);
+  fill(255, 255, 255);
+  noStroke();
+
+  push();
+  textSize(30);
+  textFont("Futura");
+  text("Game Over", 268, 220);
+  pop();
+
+  push();
+  fill(255, 255, 255);
+  rect(275, 400, 150, 50);
+  fill(0, 0, 0);
+  textSize(15);
+  textFont("Futura");
+  text("PLAY AGAIN", 305, 430);
+  pop();
+
+  if (buttonIsClicked) {
+    gameScreen();
+    isGameActive = true;
+  }
+}
+
+// WINNER SCREEN
+function winnerScreen() {
+  background(48, 25, 52);
+  fill(255, 255, 255);
+  noStroke();
+
+  push();
+  textSize(30);
+  textFont("Futura");
+  text("You Won!", 280, 220);
+  pop();
+
+  push();
+  fill(255, 255, 255);
+  rect(275, 400, 150, 50);
+  fill(0, 0, 0);
+  textSize(15);
+  textFont("Futura");
+  text("PLAY AGAIN", 305, 430);
+  pop();
+
+  if (buttonIsClicked) {
+    gameScreen();
+    isGameActive = true;
+  }
+}
+
+// GAME SCREEN
+function gameScreen() {
+  rocket();
+  background(48, 25, 52);
+  noStroke();
+
+  for (let index in starX) {
+    fill(255, 255, 255, Math.abs(Math.sin(starAlpha[index])) * 255);
+    ellipse(starX[index], starY[index], 1);
+    starAlpha[index] = starAlpha[index] + 0.02;
+  }
+
+  push();
+  fill(0, 188, 228);
+  rect(0, 600, width, 100);
+
+  stroke(0, 210, 260);
+  strokeWeight(3);
+  fill(10, 150, 200);
+  ellipse(80, 650, 130, [30]);
+  ellipse(500, 670, 100, [30]);
+  ellipse(250, 620, 80, [10]);
+  ellipse(600, 630, 70, [20]);
+  ellipse(350, 640, 50, [10]);
+  ellipse(500, 630, 60, [10]);
+  ellipse(200, 680, 70, [15]);
+  ellipse(660, 660, 50, [10]);
+  pop();
+}
+
+// ROCKET
 function rocket() {
   push();
   translate(x, y);
@@ -50,120 +180,74 @@ function rocket() {
   if (isGameActive) {
     y = y + up;
     up = up + 0.1;
+    x = x + leftRight;
     y = y + down;
   }
 
+  if (keyIsDown(39)) {
+    leftRight = 3;
+  } else if (keyIsDown(37)) {
+    leftRight = -3;
+  } else {
+    leftRight = 0;
+  }
   if (keyIsDown(32)) {
     up = up - 0.3;
   }
-}
 
-// Scenery
-function scenery() {
-  noStroke();
-  fill(48, 25, 52);
-  rect(0, 0, width, height);
-}
-
-for (let i = 0; i < 1000; i++) {
-  const x = Math.floor(Math.random() * width);
-  const y = Math.floor(Math.random() * height);
-  const alpha = Math.random();
-
-  starX.push(x);
-  starY.push(y);
-  starAlpha.push(alpha);
-}
-
-function scenery() {
-  noStroke();
-  background(48, 25, 52);
-  for (let index in starX) {
-    fill(255, 255, 255, Math.abs(Math.sin(starAlpha[index])) * 255);
-    ellipse(starX[index], starY[index], 1);
-    starAlpha[index] = starAlpha[index] + 0.02;
+  if (y >= 330 && up >= maxVelocity) {
+    console.log("game over");
+    isGameActive = false;
+    gameoverScreen();
   }
-  fill(0, 188, 228);
-  rect(0, 600, width, 100);
 
-  stroke(0, 210, 260);
-  strokeWeight(3);
-  fill(10, 150, 200);
-  ellipse(80, 650, 130, [30]);
-  ellipse(500, 670, 100, [30]);
-  ellipse(250, 620, 80, [10]);
-  ellipse(600, 630, 70, [20]);
-  ellipse(350, 640, 50, [10]);
-  ellipse(500, 630, 60, [10]);
-  ellipse(200, 680, 70, [15]);
-  ellipse(660, 660, 50, [10]);
+  if (y >= 330 && up <= maxVelocity) {
+    console.log("win");
+    isGameActive = false;
+    winnerScreen();
+  }
+
+  // Rocket movement limits
+  if (x > 450) x = 449;
+  if (x < -200) x = -199;
+  if (y > 400) y = 399;
+  if (y < -200) y = -199;
+}
+
+// Restart game
+function reset() {
+  isGameActive = true;
+  x = 0;
+  y = 0;
+  speed = 0;
+  maxVelocity = 3;
+  down = 0.7;
+  up = 0.3;
 }
 
 function draw() {
-  scenery();
-  rocket(100, 100);
-}
+  if (
+    mouseIsPressed &&
+    mouseX > 275 &&
+    mouseX < 275 + 150 &&
+    mouseY &&
+    mouseY > 400 &&
+    mouseY < 400 + 50
+  ) {
+    console.log("pressed");
+    gameScreen();
+    reset();
+    state = "game";
+  }
 
-// Start screen
-function startScreen() {
-  background(48, 25, 52);
-  fill(255, 255, 255);
-  noStroke();
-  textSize(30);
-  textFont("Futura");
-  text("Lunar Lander", 258, 200);
-  textSize(15);
-  textFont("Futura");
-  text("Click anywhere on the screen to start the game!", 186, 300);
-}
-
-// Game screen
-function gameScreen() {
-  scenery();
-  rocket();
-}
-
-// Result screen
-function resultScreen() {
-  background(48, 25, 52);
-  fill(255, 255, 255);
-  noStroke();
-  textSize(30);
-  textFont("Futura");
-  text("Result", 308, 200);
-  textSize(15);
-  textFont("Futura");
-  text("Click anywhere on the screen to restart the game!", 180, 400);
-}
-
-let state = "start";
-let gameTimer = 0;
-
-function draw() {
   if (state === "start") {
     startScreen();
+  } else if (state === "game over") {
+    gameoverScreen();
   } else if (state === "game") {
     gameScreen();
-    gameTimer = gameTimer + 0.2;
-    if (gameTimer >= 100) {
-      gameTimer = 0;
-      state = "result";
-    }
-  } else if (state === "result") {
-    resultScreen();
+    rocket();
+  } else if (state === "win") {
+    winnerScreen();
   }
-}
-
-function mouseClicked() {
-  if (state === "start") {
-    state = "game";
-  } else if (state === "result") {
-    state = "game";
-  }
-}
-
-if (mouseIsClicked);
-{
-  gameScreen();
-  isGameActive = true;
 }
