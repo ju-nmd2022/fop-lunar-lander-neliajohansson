@@ -131,7 +131,7 @@ function gameScreen() {
   fill(0, 188, 228);
   rect(0, 600, width, 100);
 
-  stroke(0, 210, 260);
+  stroke(0, 210, 255);
   strokeWeight(3);
   fill(10, 150, 200);
   ellipse(80, 650, 130, [30]);
